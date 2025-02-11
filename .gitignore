@@ -1,0 +1,22 @@
+# Archivos de configuración de entorno
+*.log
+*.tmp
+*.bak
+
+# Archivos generados durante la compilación
+/build/
+*.elf
+*.bin
+*.hex
+*.epp
+
+# Archivos temporales de IDE
+.vscode/
+.idea/
+
+# Ignorar la configuración de secretos
+secrets.h
+
+# Archivos específicos de ESP32
+*.bin
+*.espressif
