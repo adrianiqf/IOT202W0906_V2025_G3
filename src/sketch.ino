@@ -16,10 +16,18 @@
 Servo servo; 
 
 #define AWS_IOT_PUBLISH_TOPIC   "molinete/pub"
+#define AWS_IOT_PUBLISH_TOPIC2   "molinete/servo/pub"
+#define AWS_IOT_PUBLISH_TOPIC3   "molinete/rfid/pub"
+#define AWS_IOT_PUBLISH_TOPIC4   "molinete/infrarojo/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "molinete/sub"
 
 bool ingreso = false;
 String pin = " ";
+int angulo = 0;
+unsigned long previousMillis = 0; // Stores last time the timer was updated
+const long interval = 1000; // Interval at which to trigger (in milliseconds)
+
+
 
 WiFiClientSecure net;
 PubSubClient client(net);
@@ -31,7 +39,7 @@ void connectAWS()
   WiFi.mode(WIFI_STA);
   WiFi.begin("Wokwi-GUEST", "");
 
-  Serial.println("Connecting to Wi-Fi");
+  Serial.println("Connecting to Wi-Fi EHEM");
 
   while (WiFi.status() != WL_CONNECTED)
   {
@@ -74,12 +82,25 @@ void publishMessage()
   StaticJsonDocument<200> doc;
   doc["timestamp"] = timeClient.getEpochTime() + (7 * 3600);  
   doc["ingreso"] = ingreso;
-  doc["pin"] = pin;
+  doc["id"] = pin;
   char jsonBuffer[512];
 
   serializeJson(doc, jsonBuffer); // print to client
 
   client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  
+}
+
+void publishMessage2()
+{
+  
+  StaticJsonDocument<200> doc;
+  doc["angulo"] = angulo;  
+  char jsonBuffer[512];
+
+  serializeJson(doc, jsonBuffer); 
+
+  client.publish(AWS_IOT_PUBLISH_TOPIC2, jsonBuffer);
   
 }
 
@@ -97,6 +118,7 @@ void messageHandler(char* topic, byte* payload, unsigned int length)
 
 void setup() {
   Serial.begin(115200); 
+  Serial.println("Hola");
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -120,7 +142,9 @@ void loop() {
   if (Serial.available()) {
     String input = Serial.readStringUntil('\n');
     input.trim(); 
+    client.loop();
     timeClient.update();
+    unsigned long currentMillis = millis(); 
 
     if (isValidFormat(input)) {
 
@@ -134,15 +158,27 @@ void loop() {
         accessDenied();
       }
 
+      
       publishMessage();
 
     } else {
       Serial.println("Invalid format. Enter e-KTP ID (format: XX XX XX XX):");
     }
+
     ingreso = false;
+   
+    // Check if interval has passed
+    if (currentMillis - previousMillis >= interval) {
+        previousMillis = currentMillis; // Save the last time the event occurred
+        angulo = servo.read();
+        publishMessage2();
+        // Your timed event
+        Serial.println("Timer triggered!");
+    }
+
+  
   }
-  client.loop();
-  delay(500);
+ 
 
 }
 
