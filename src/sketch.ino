@@ -6,6 +6,8 @@
 #include <ArduinoJson.h>
 #include <WiFi.h>
 #include <NTPClient.h>
+#include <HTTPClient.h>
+
 
 #define BUZZER_PIN   14 
 #define GREEN_LED    26 
@@ -20,14 +22,6 @@ Servo servo;
 #define AWS_IOT_PUBLISH_TOPIC3   "molinete/rfid/pub"
 #define AWS_IOT_PUBLISH_TOPIC4   "molinete/infrarojo/pub"
 #define AWS_IOT_SUBSCRIBE_TOPIC "molinete/sub"
-
-bool ingreso = false;
-String pin = " ";
-int angulo = 0;
-unsigned long previousMillis = 0; // Stores last time the timer was updated
-const long interval = 1000; // Interval at which to trigger (in milliseconds)
-
-
 
 WiFiClientSecure net;
 PubSubClient client(net);
@@ -56,7 +50,7 @@ void connectAWS()
   client.setServer(AWS_IOT_ENDPOINT, 8883);
 
   // Create a message handler
-  client.setCallback(messageHandler);
+  //client.setCallback(messageHandler);
 
   Serial.println("Connecting to AWS IoT");
 
@@ -76,43 +70,20 @@ void connectAWS()
   }
 }
 
-void publishMessage()
+void publishRFIDData(int cardID, bool access, int puerta)
 {
   
   StaticJsonDocument<200> doc;
-  doc["timestamp"] = timeClient.getEpochTime() + (7 * 3600);  
-  doc["ingreso"] = ingreso;
-  doc["id"] = pin;
+  doc["hora"] = timeClient.getEpochTime() + (7 * 3600);  
+  doc["ingreso"] = access;
+  doc["id"] = cardID;
+  doc["puerta"] = puerta;
   char jsonBuffer[512];
 
   serializeJson(doc, jsonBuffer); // print to client
 
-  client.publish(AWS_IOT_PUBLISH_TOPIC, jsonBuffer);
+  client.publish(AWS_IOT_PUBLISH_TOPIC3, jsonBuffer);
   
-}
-
-void publishMessage2()
-{
-  
-  StaticJsonDocument<200> doc;
-  doc["angulo"] = angulo;  
-  char jsonBuffer[512];
-
-  serializeJson(doc, jsonBuffer); 
-
-  client.publish(AWS_IOT_PUBLISH_TOPIC2, jsonBuffer);
-  
-}
-
-void messageHandler(char* topic, byte* payload, unsigned int length)
-{
-  Serial.print("Incoming message from topic: ");
-  Serial.println(topic);
-
-  StaticJsonDocument<200> doc;
-  deserializeJson(doc, payload, length);
-  const char* message = doc["message"];
-  Serial.println(message);
 }
 
 
@@ -133,68 +104,84 @@ void setup() {
   servo.attach(SERVO_PIN); 
   servo.write(0);
 
-  Serial.println("Enter e-KTP ID (format: XX XX XX XX):");
   timeClient.begin();
   timeClient.setTimeOffset(0);
 }
 
 void loop() {
   if (Serial.available()) {
+    Serial.println("Enter e-KTP ID (format: XX XX XX XX):");
     String input = Serial.readStringUntil('\n');
     input.trim(); 
+    Serial.println("CardID: " + input);
     client.loop();
     timeClient.update();
-    unsigned long currentMillis = millis(); 
-
-    if (isValidFormat(input)) {
-
-      pin = input;
-
-      if (input.equals("12 34 56 78")) { 
-        accessGranted();
-        ingreso = true;
+    
+    int cardID = validateCard(input);
+    if (cardID>-1) { 
+      accessGranted();
         
-      } else {
-        accessDenied();
-      }
-
-      
-      publishMessage();
-
-    } else {
-      Serial.println("Invalid format. Enter e-KTP ID (format: XX XX XX XX):");
+    }else {
+      accessDenied();
     }
-
-    ingreso = false;
+    publishRFIDData(cardID, access, 1);
    
-    // Check if interval has passed
-    if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis; // Save the last time the event occurred
-        angulo = servo.read();
-        publishMessage2();
-        // Your timed event
-        Serial.println("Timer triggered!");
-    }
-
+   sleep(50);
   
   }
  
 
 }
 
-bool isValidFormat(String input) {
-  if (input.length() == 11 && input.charAt(2) == ' ' && input.charAt(5) == ' ' && input.charAt(8) == ' ') {
-    for (int i = 0; i < input.length(); i++) {
-      if (i != 2 && i != 5 && i != 8) {
-        if (!isDigit(input.charAt(i))) {
-          return false;
+int validateCard(String cardID) {
+    HTTPClient http;
+    http.begin(API_URL);
+    http.addHeader("Content-Type", "application/json");
+
+    // Prepare JSON payload
+    String payload = "{\"id\":\"" + cardID + "\"}";
+
+    Serial.println("Validating card: " + cardID);
+    int httpResponseCode = http.POST(payload);
+
+    if (httpResponseCode > 0) {
+        String response = http.getString();
+        Serial.println("Response: " + response);
+        http.end();
+
+        // Parse the outer JSON response (statusCode and body)
+        StaticJsonDocument<200> doc;
+        DeserializationError error = deserializeJson(doc, response);
+
+        if (!error && doc.containsKey("body")) {
+            // Extract the 'body' JSON string
+            String body = doc["body"].as<String>();
+
+            // Parse the 'body' as a separate JSON object
+            StaticJsonDocument<200> bodyDoc;
+            DeserializationError bodyError = deserializeJson(bodyDoc, body);
+
+            if (!bodyError && bodyDoc.containsKey("card_id")) {
+                // Ensure the card_id is returned as an integer
+                int cardID = bodyDoc["card_id"].as<int>();
+                return cardID;  // Return the card ID from the response
+            } else {
+                Serial.println("Invalid body response format");
+                return -1;  // Return -1 if card_id is not found in body
+            }
+        } else {
+            Serial.println("Invalid outer response format");
+            return -1;  // Return -1 if 'body' is not found
         }
-      }
+    } else {
+        Serial.println("HTTP Request Failed");
+        http.end();
+        return -1;  // Return -1 if HTTP request failed
     }
-    return true;
-  }
-  return false;
 }
+
+
+
 
 void accessGranted() {
   Serial.println("Access granted!");
