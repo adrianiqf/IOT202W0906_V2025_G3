@@ -28,18 +28,21 @@ PubSubClient client(net);
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "id.pool.ntp.org");
 
-void connectAWS()
-{
+void connectToWifi(){
   WiFi.mode(WIFI_STA);
   WiFi.begin("Wokwi-GUEST", "");
 
-  Serial.println("Connecting to Wi-Fi EHEM");
+  Serial.println("Connecting to Wi-Fi");
 
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
   }
+}
+
+void connectAWS()
+{
 
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   net.setCACert(AWS_CERT_CA);
@@ -60,21 +63,25 @@ void connectAWS()
     if (client.connect(THINGNAME))
     {
       Serial.println("Connected to AWS IoT");
-      client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
+      //client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
     }
     else
     {
       Serial.println("AWS IoT Connection Failed! Retrying...");
-      delay(1000);
+      delay(100);
     }
   }
 }
 
 void publishRFIDData(int cardID, bool access, int puerta)
 {
-  
+  if (!client.connected()) {
+    Serial.println("MQTT Disconnected! Reconnecting...");
+    connectAWS();  
+  }
+  Serial.println("Publicando ingreso a IOTCORE...");
   StaticJsonDocument<200> doc;
-  doc["hora"] = timeClient.getEpochTime() + (7 * 3600);  
+  //doc["hora"] = timeClient.getEpochTime() + (7 * 3600);  
   doc["ingreso"] = access;
   doc["id"] = cardID;
   doc["puerta"] = puerta;
@@ -83,13 +90,13 @@ void publishRFIDData(int cardID, bool access, int puerta)
   serializeJson(doc, jsonBuffer); // print to client
 
   client.publish(AWS_IOT_PUBLISH_TOPIC3, jsonBuffer);
-  
+  Serial.println("Mensaje publicado!");
 }
 
 
 void setup() {
   Serial.begin(115200); 
-  Serial.println("Hola");
+  connectToWifi();
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -109,29 +116,29 @@ void setup() {
 }
 
 void loop() {
+  
+  client.loop();
+  timeClient.update();
+  
   if (Serial.available()) {
     Serial.println("Enter e-KTP ID (format: XX XX XX XX):");
     String input = Serial.readStringUntil('\n');
     input.trim(); 
     Serial.println("CardID: " + input);
-    client.loop();
-    timeClient.update();
     
     int cardID = validateCard(input);
-    if (cardID>-1) { 
+    bool access = cardID > -1;
+
+    if (access) { 
       accessGranted();
-        
-    }else {
+    } else {
       accessDenied();
     }
-    publishRFIDData(cardID, access, 1);
-   
-   sleep(50);
-  
-  }
- 
 
+    publishRFIDData(cardID, access, 1);
+  }
 }
+
 
 int validateCard(String cardID) {
     HTTPClient http;
