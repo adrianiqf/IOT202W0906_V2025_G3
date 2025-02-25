@@ -10,9 +10,13 @@
 #include <MFRC522.h>
 #include <SPI.h>
 
-// Pines RFID
-#define SS_PIN 5
-#define RST_PIN 0
+// RFID 1
+#define RFID1_SS_PIN 5
+#define RFID1_RST_PIN 0
+
+// RFID2
+#define RFID2_SS_PIN 15
+#define RFID2_RST_PIN 2
 
 #define BUZZER_PIN 14
 #define GREEN_LED 26
@@ -21,7 +25,8 @@
 #define SERVO_PIN 13
 
 Servo servo;
-MFRC522 rfid(SS_PIN, RST_PIN); // Instancia de la clase MFRC522
+MFRC522 rfid1(RFID1_SS_PIN, RFID1_RST_PIN);
+MFRC522 rfid2(RFID2_SS_PIN, RFID2_RST_PIN);
 MFRC522::MIFARE_Key key;
 // Array para guardar el uid de la tarjeta
 byte nuidPICC[4];
@@ -40,7 +45,7 @@ NTPClient timeClient(ntpUDP, "id.pool.ntp.org");
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Hola");
+  Serial.println("Iniciando");
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -56,7 +61,8 @@ void setup()
   servo.write(0);
   // Inicializa el lector RFID
   SPI.begin();
-  rfid.PCD_Init();
+  rfid1.PCD_Init();
+  rfid2.PCD_Init();
   // Asigna la variable de la llave con un valor por defecto
   for (byte i = 0; i < 6; i++)
   {
@@ -72,41 +78,9 @@ void loop()
   client.loop();
   timeClient.update();
   //Serial.println("Enter e-KTP ID (format: XX XX XX XX):");
-  // Verifica si hay una tarjeta presente y la lee
-  if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
-  {
-    return;
-  }
-  Serial.println("Card detected:");
-  for (byte i = 0; i < rfid.uid.size; i++)
-  {
-    nuidPICC[i] = rfid.uid.uidByte[i];
-    Serial.print(rfid.uid.uidByte[i], HEX);
-  }
-  Serial.println();
-  // Convertir el UUID a un string
-  String cardNumber = "";
-  for (byte i = 0; i < size; i++)
-  {
-    if (uuid[i] < 0x10)
-    {
-      cardNumber += "0";
-    }else{
-      cardNumber += " ";
-    }
-    cardNumber += String(uuid[i], HEX);
-  }
-  int cardID = validateCard(cardNumber);
-  if (cardID > -1)
-  {
-    accessGranted();
-  }
-  else
-  {
-    accessDenied();
-  }
-  publishRFIDData(cardID, cardNumber,access, 1);
-  rfid.PICC_HaltA();
+  processRFID(rfid1, 1);
+  
+  processRFID(rfid2, 2);
   
 }
 
@@ -119,9 +93,9 @@ int validateCard(String cardNumber)
   
 
   // Prepare JSON payload
-  String payload = "{\"id\":\"" + uuidStr + "\"}";
+  String payload = "{\"id\":\"" + cardNumber + "\"}";
 
-  Serial.println("Validating card: " + uuidStr);
+  Serial.println("Validating card: " + cardNumber);
   int httpResponseCode = http.POST(payload);
 
   if (httpResponseCode > 0)
@@ -253,4 +227,36 @@ void accessDenied()
   delay(5000);
   digitalWrite(BUZZER_PIN, LOW);
   digitalWrite(RED_LED, LOW);
+}
+
+
+// Función que procesa la lectura de una tarjeta RFID en un lector específico
+void processRFID(MFRC522 &rfidModule, int door) {
+  // Verifica si hay tarjeta presente y se pudo leer
+  if (!rfidModule.PICC_IsNewCardPresent() || !rfidModule.PICC_ReadCardSerial()) {
+    return;
+  }
+  
+  Serial.println("Card detected:");
+  
+  String cardNumber = "";
+  for (byte i = 0; i < rfidModule.uid.size; i++) {
+    cardNumber += String(rfidModule.uid.uidByte[i], HEX);
+    Serial.print(rfidModule.uid.uidByte[i], HEX);
+  }
+  Serial.println();
+  
+  int cardID = validateCard(cardNumber);
+  bool access = false;
+  
+  if (cardID > -1) {
+    accessGranted();
+    access = true;
+  } else {
+    accessDenied();
+  }
+  
+  publishRFIDData(cardID, cardNumber, access, door);
+  
+  rfidModule.PICC_HaltA();
 }
