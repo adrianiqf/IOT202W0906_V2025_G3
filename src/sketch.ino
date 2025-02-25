@@ -84,7 +84,19 @@ void loop()
     Serial.print(rfid.uid.uidByte[i], HEX);
   }
   Serial.println();
-  int cardID = validateCard(nuidPICC, rfid.uid.size);
+  // Convertir el UUID a un string
+  String cardNumber = "";
+  for (byte i = 0; i < size; i++)
+  {
+    if (uuid[i] < 0x10)
+    {
+      cardNumber += "0";
+    }else{
+      cardNumber += " ";
+    }
+    cardNumber += String(uuid[i], HEX);
+  }
+  int cardID = validateCard(cardNumber);
   if (cardID > -1)
   {
     accessGranted();
@@ -93,29 +105,18 @@ void loop()
   {
     accessDenied();
   }
-  publishRFIDData(cardID, access, 1);
+  publishRFIDData(cardID, cardNumber,access, 1);
   rfid.PICC_HaltA();
   
 }
 
-int validateCard(byte uuid[], byte size)
+int validateCard(String cardNumber)
 {
   HTTPClient http;
   http.begin(API_URL);
   http.addHeader("Content-Type", "application/json");
 
-  // Convertir el UUID a un string
-  String uuidStr = "";
-  for (byte i = 0; i < size; i++)
-  {
-    if (uuid[i] < 0x10)
-    {
-      uuidStr += "0";
-    }else{
-      uuidStr += " ";
-    }
-    uuidStr += String(uuid[i], HEX);
-  }
+  
 
   // Prepare JSON payload
   String payload = "{\"id\":\"" + uuidStr + "\"}";
@@ -210,14 +211,15 @@ void connectAWS()
   }
 }
 
-void publishRFIDData(int cardID, bool access, int puerta)
+void publishRFIDData(int cardID, String cardNumber, bool access, int puerta)
 {
 
   StaticJsonDocument<200> doc;
-  doc["hora"] = timeClient.getEpochTime() + (7 * 3600);
-  doc["ingreso"] = access;
-  doc["id"] = cardID;
-  doc["puerta"] = puerta;
+  doc["fecha"] = timeClient.getEpochTime() + (-5 * 3600);
+  doc["acceso"] = access;
+  doc["id_tarjeta"] = cardID;
+  doc["numero_tarjeta"] = cardNumber;
+  doc["dispositivo"] = "rfid" + String(puerta);
   char jsonBuffer[512];
 
   serializeJson(doc, jsonBuffer); // print to client
