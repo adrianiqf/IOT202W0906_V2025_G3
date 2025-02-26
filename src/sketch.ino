@@ -66,20 +66,24 @@ void setup()
 
   timeClient.begin();
   timeClient.setTimeOffset(0);
+  Serial.println("Setup finalizado");
+  Serial.println("");
 }
 
 void loop()
 {
   client.loop();
   timeClient.update();
-  //Serial.println("Enter e-KTP ID (format: XX XX XX XX):");
+  Serial.println("Por favor acerque su tarjeta:");
   // Verifica si hay una tarjeta presente y la lee
   if (!rfid.PICC_IsNewCardPresent() || !rfid.PICC_ReadCardSerial())
   {
     return;
   }
-  Serial.println("Card detected:");
-   String cardNumber = "";
+  String cardNumber = "";
+  /*
+  cardNumber = Serial.readStringUntil('\n');
+  */
   for (byte i = 0; i < rfid.uid.size; i++)
   {
     //nuidPICC[i] = ;
@@ -92,19 +96,22 @@ void loop()
     }
     cardNumber += String(rfid.uid.uidByte[i] , HEX);
   }
-  Serial.println(cardNumber);
+  cardNumber.trim();
+  Serial.println("Card number: " + cardNumber);
   // Convertir el UUID a un string
  
   int cardID = validateCard(cardNumber);
   if (cardID > -1)
   {
     accessGranted();
+    publishRFIDData(cardID, cardNumber,true, 1);
   }
   else
   {
     accessDenied();
+    publishRFIDData(cardID, cardNumber,false, 1);
   }
-  publishRFIDData(cardID, cardNumber,access, 1);
+  
   rfid.PICC_HaltA();
   
 }
@@ -172,18 +179,18 @@ void connectWifi(){
   WiFi.mode(WIFI_STA);
   WiFi.begin("Wokwi-GUEST", "");
 
-  Serial.println("Connecting to Wi-Fi");
+  Serial.print("Conectando a Wi-Fi");
 
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
   }
+  Serial.println("");
 }
 
 void setupAWS()
 {
-
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   net.setCACert(AWS_CERT_CA);
   net.setCertificate(AWS_CERT_CRT);
@@ -194,22 +201,24 @@ void setupAWS()
 
   // Create a message handler
   // client.setCallback(messageHandler);
+  Serial.println("Conexion AWS IOT configurada");
 }
 
 void connectAWS()
 {
-
+  Serial.print("Conectando a AWS IoT");
   while (!client.connected())
   {
     Serial.print(".");
     if (client.connect(THINGNAME))
     {
-      Serial.println("Connected to AWS IoT");
+      Serial.println("");
+      Serial.println("Connectado a AWS IoT");
       client.subscribe(AWS_IOT_SUBSCRIBE_TOPIC);
     }
     else
     {
-      Serial.println("AWS IoT Connection Failed! Retrying...");
+      Serial.println("Error al conectar a AWS IoT");
       delay(1000);
     }
   }
@@ -218,6 +227,7 @@ void connectAWS()
 void publishRFIDData(int cardID, String cardNumber, bool access, int puerta)
 {
   if (!client.connected()){
+    Serial.println("Se perdio la conexion con AWS IoT, reconectando...");
     connectAWS();
   }
   Serial.println("Publicando datos de RFID a AWS IoT");
