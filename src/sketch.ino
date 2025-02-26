@@ -177,7 +177,7 @@ int validateCard(String uuidStr)
 
 void connectWifi(){
   WiFi.mode(WIFI_STA);
-  WiFi.begin("Wokwi-GUEST", "");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
   Serial.print("Conectando a Wi-Fi");
 
