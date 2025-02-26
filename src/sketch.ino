@@ -40,7 +40,8 @@ NTPClient timeClient(ntpUDP, "id.pool.ntp.org");
 void setup()
 {
   Serial.begin(115200);
-  Serial.println("Hola");
+  connectWifi();
+  setupAWS();
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -78,24 +79,22 @@ void loop()
     return;
   }
   Serial.println("Card detected:");
+   String cardNumber = "";
   for (byte i = 0; i < rfid.uid.size; i++)
   {
-    nuidPICC[i] = rfid.uid.uidByte[i];
-    Serial.print(rfid.uid.uidByte[i], HEX);
-  }
-  Serial.println();
-  // Convertir el UUID a un string
-  String cardNumber = "";
-  for (byte i = 0; i < size; i++)
-  {
-    if (uuid[i] < 0x10)
+    //nuidPICC[i] = ;
+    //Serial.print(rfid.uid.uidByte[i], HEX);
+    if (rfid.uid.uidByte[i] < 0x10)
     {
       cardNumber += "0";
     }else{
       cardNumber += " ";
     }
-    cardNumber += String(uuid[i], HEX);
+    cardNumber += String(rfid.uid.uidByte[i] , HEX);
   }
+  Serial.println(cardNumber);
+  // Convertir el UUID a un string
+ 
   int cardID = validateCard(cardNumber);
   if (cardID > -1)
   {
@@ -110,7 +109,7 @@ void loop()
   
 }
 
-int validateCard(String cardNumber)
+int validateCard(String uuidStr)
 {
   HTTPClient http;
   http.begin(API_URL);
@@ -169,18 +168,21 @@ int validateCard(String cardNumber)
   }
 }
 
-void connectAWS()
-{
+void connectWifi(){
   WiFi.mode(WIFI_STA);
   WiFi.begin("Wokwi-GUEST", "");
 
-  Serial.println("Connecting to Wi-Fi EHEM");
+  Serial.println("Connecting to Wi-Fi");
 
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
     Serial.print(".");
   }
+}
+
+void setupAWS()
+{
 
   // Configure WiFiClientSecure to use the AWS IoT device credentials
   net.setCACert(AWS_CERT_CA);
@@ -192,8 +194,10 @@ void connectAWS()
 
   // Create a message handler
   // client.setCallback(messageHandler);
+}
 
-  Serial.println("Connecting to AWS IoT");
+void connectAWS()
+{
 
   while (!client.connected())
   {
@@ -213,18 +217,23 @@ void connectAWS()
 
 void publishRFIDData(int cardID, String cardNumber, bool access, int puerta)
 {
-
+  if (!client.connected()){
+    connectAWS();
+  }
+  Serial.println("Publicando datos de RFID a AWS IoT");
   StaticJsonDocument<200> doc;
   doc["fecha"] = timeClient.getEpochTime() + (-5 * 3600);
   doc["acceso"] = access;
   doc["id_tarjeta"] = cardID;
   doc["numero_tarjeta"] = cardNumber;
   doc["dispositivo"] = "rfid" + String(puerta);
+  doc["detectado"] = true;
   char jsonBuffer[512];
 
   serializeJson(doc, jsonBuffer); // print to client
 
   client.publish(AWS_IOT_PUBLISH_TOPIC3, jsonBuffer);
+  Serial.println("Datos publicados");
 }
 
 
