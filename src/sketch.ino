@@ -232,31 +232,38 @@ void accessDenied()
 
 // Función que procesa la lectura de una tarjeta RFID en un lector específico
 void processRFID(MFRC522 &rfidModule, int door) {
-  // Verifica si hay tarjeta presente y se pudo leer
-  if (!rfidModule.PICC_IsNewCardPresent() || !rfidModule.PICC_ReadCardSerial()) {
+  // Verifica si hay una tarjeta presente y la lee
+  if (!rfidModule.PICC_IsNewCardPresent() || !rfidModule.PICC_ReadCardSerial())
+  {
     return;
   }
-  
-  Serial.println("Card detected:");
-  
   String cardNumber = "";
-  for (byte i = 0; i < rfidModule.uid.size; i++) {
-    cardNumber += String(rfidModule.uid.uidByte[i], HEX);
-    Serial.print(rfidModule.uid.uidByte[i], HEX);
+
+  for (byte i = 0; i < rfidModule.uid.size; i++)
+  {
+
+    if (rfidModule.uid.uidByte[i] < 0x10)
+    {
+      cardNumber += "0";
+    }else{
+      cardNumber += " ";
+    }
+    cardNumber += String(rfidModule.uid.uidByte[i] , HEX);
   }
-  Serial.println();
-  
+  cardNumber.trim();
+  Serial.println("Card number: " + cardNumber);
+ 
   int cardID = validateCard(cardNumber);
-  bool access = false;
-  
-  if (cardID > -1) {
+  if (cardID > -1)
+  {
     accessGranted();
-    access = true;
-  } else {
-    accessDenied();
+    publishRFIDData(cardID, cardNumber,true, 1);
   }
-  
-  publishRFIDData(cardID, cardNumber, access, door);
+  else
+  {
+    accessDenied();
+    publishRFIDData(cardID, cardNumber,false, 1);
+  }
   
   rfidModule.PICC_HaltA();
 }
