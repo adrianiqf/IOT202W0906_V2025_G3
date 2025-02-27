@@ -119,7 +119,7 @@ void loop()
 int validateCard(String uuidStr)
 {
   HTTPClient http;
-  http.begin(API_URL);
+  http.begin(VALIDATION_API);
   http.addHeader("Content-Type", "application/json");
 
   
