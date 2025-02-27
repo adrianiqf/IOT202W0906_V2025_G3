@@ -94,9 +94,9 @@ int validateCard(String uuidStr)
   
 
   // Prepare JSON payload
-  String payload = "{\"id\":\"" + cardNumber + "\"}";
+  String payload = "{\"id\":\"" + uuidStr + "\"}";
 
-  Serial.println("Validating card: " + cardNumber);
+  Serial.println("Validating card: " + uuidStr);
   int httpResponseCode = http.POST(payload);
 
   if (httpResponseCode > 0)
@@ -161,6 +161,7 @@ void connectWifi(){
 void setupAWS()
 {
   // Configure WiFiClientSecure to use the AWS IoT device credentials
+  
   net.setCACert(AWS_CERT_CA);
   net.setCertificate(AWS_CERT_CRT);
   net.setPrivateKey(AWS_CERT_PRIVATE);
