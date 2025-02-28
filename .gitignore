@@ -14,6 +14,9 @@
 .vscode/
 .idea/
 
+# Firmware de simulacion
+/.pio/
+
 # Ignorar la configuración de secretos
 secrets.h
 
