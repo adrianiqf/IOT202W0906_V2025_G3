@@ -45,6 +45,8 @@ NTPClient timeClient(ntpUDP, "id.pool.ntp.org");
 void setup()
 {
   Serial.begin(115200);
+  connectWifi();
+  setupAWS();
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -252,8 +254,9 @@ void processRFID(MFRC522 &rfidModule, int door) {
   {
     return;
   }
+ Serial.println("Acerque la tarjeta al lector");
   String cardNumber = "";
-
+  //cardNumber = Serial.readStringUntil('\n');
   for (byte i = 0; i < rfidModule.uid.size; i++)
   {
 
