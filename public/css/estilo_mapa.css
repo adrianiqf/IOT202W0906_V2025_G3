@@ -1,0 +1,552 @@
+/*Estilos generales*/
+*{
+    padding: 0px;
+    margin: 0px;
+}
+
+html{
+    min-height: 100%;
+}
+body{
+  flex-direction: column;
+  height:100vh;
+}
+/*Estilos cabecera*/
+header{
+    height: 10%;
+    width: 100%;
+    display: block;
+    background-color: #68141C;
+}
+/*contenedor del header*/
+ #cabecera{
+    position: relative;
+    margin-top: auto;
+    display: flex;
+    padding: 0 auto;
+    color: #fff;
+ }
+ #cabecera h3{
+    position: relative;
+    margin-top: auto;
+    margin-bottom: auto;
+    color: #fff;
+ }
+/*imagen dentro del header*/
+#cabecera img{
+    width: 5%;
+    left: 15px;
+}
+
+/*Boton dentro del header*/
+#cabecera button{
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translate(0,-50%);
+    background-color: #68141C;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 0 0.5rem;
+}
+
+#cabecera button img{
+    width: 50%;
+    inline-size: 50px;
+}
+
+/*Estilos del mapa*/
+#pantalla_mapa{
+width: 100%;
+height: 90%;
+position: relative;
+}
+
+
+/* Estilos clase buscador */
+.buscador {
+    margin-left: 1.5em;
+    margin-top: 1.5em;
+    position: absolute;
+    width: 25%; /* Ancho fijo actual, puede ajustarse */
+    z-index: 1;
+}
+
+/* Estilo buscador dentro de la pantalla mapa */
+@media (max-width: 768px) {
+    .buscador {
+        position: relative; /* Cambiar a posición relativa para que sea relativo al contenedor */
+        width: 100%; /* Ocupar todo el ancho del contenedor */
+        margin: 1px 1px; /* Reducir el margen */
+        box-sizing: border-box; /* Incluir el relleno en el ancho total */
+        
+    }
+}
+
+/* Estilo barra de búsqueda dentro de buscador */
+.buscador input {
+    width: 100%; /* Ocupar todo el ancho del contenedor */
+    height: 40px; /* Altura de la barra de búsqueda */
+    padding: 0 10px; /* Relleno interno */
+    box-sizing: border-box; /* Incluir el relleno en el ancho total */
+    border: 1px solid #ccc; /* Borde para la barra de búsqueda */
+    border-radius: 5px; /* Borde redondeado */
+    font-size: 16px; /* Tamaño de fuente */
+}
+
+@media (max-width: 768px) {
+    .buscador input {
+        height: 30px; /* Reducir la altura en dispositivos móviles */
+        font-size: 14px; /* Reducir el tamaño de fuente en dispositivos móviles */
+    }
+}
+
+/*Estilos clase botones*/
+.botones{
+    position: absolute;
+    z-index: 1;
+}
+/*--------------------------------------------------------------------*/
+/*Estilo del boton de cambio de pantalla: mapa-horarios*/
+#cambia_MapaHorario{
+    position: absolute;
+    bottom: 10px;
+    left: 5%;
+    bottom: 5%;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#cambia_MapaHorario button{
+    font-size: 1.2em;
+    padding: 0.5rem 2rem;
+    border-radius: 1rem;
+    background-color: #68141C;
+    color: #fff;
+}
+/*--------------------------------------------------------------------*/
+
+/*Estilo del navegador de pisos*/
+.navegador{
+    position: absolute;
+    z-index: 1;
+    right: 1rem;
+    bottom: 6.5rem;
+}
+/*Estilo de los botones de los pisos*/
+.navegador button{
+    font-size: 1.2em;
+    width: 30px;
+    height: 30px;
+    display: block;
+}
+
+
+/*Contenedor de los botones de salon*/
+.botones_salon{
+    position: absolute;
+    z-index: 1;
+    right: 50%;
+    bottom: 50%;
+}
+
+/*Estilo boton salón 105,106*/
+.botones_salon button{
+    display: block;
+    width: 5rem;
+    height:5rem;
+    z-index: 1;
+    font-size: 3em;
+}
+
+/*Estilo del boton Vista Horario*/
+#vista_horario{
+    z-index: 1;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 50px;
+    cursor: pointer;
+    border-radius: 5px; /* Ajusta el valor para bordes menos redondeados */
+    border: 1px solid black;
+    position: relative;
+    bottom: 55px;
+    left: 10%;
+    font-size: 100%;
+    width: 7%;
+    height: 20%;
+}
+
+
+/*Estilo para la seleccion de rutas*/
+#ventanaRuta{
+    position: fixed;
+    top: 18%; /*21 antes*/
+    left: 2em;
+    width: 20%;
+    max-height: 50%; /* Altura máxima deseada de la ventana emergente */
+    overflow: auto; /* Agrega barras de desplazamiento si es necesario */
+    z-index: 1;
+    background-color: #ddd;
+}
+
+/*Estilos ventana emergente*/
+.ventana {
+    display: none;
+    position: fixed;
+    top: 21%; /*21 antes*/ 
+    left: 2em;
+    width: 24%;
+    max-height: 70%; /* Altura máxima deseada de la ventana emergente */
+    overflow: auto; /* Agrega barras de desplazamiento si es necesario */
+    z-index: 1;
+    background-color: #ddd;
+}
+.ventana_horarios {
+    background-color: #FFF7E7;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    height: 60%;
+    padding: 20px;
+    text-align: center;
+}
+.cerrar {
+    position: absolute;
+    right: 2px;
+    cursor: pointer;
+    font-size: 35px; 
+    background-color: white;
+    border-color: #68141C;
+}
+table {
+    width: 100%; 
+    font-size: 150%;
+    table-layout: fixed; 
+}
+/* BARRA DE BÚSQUEDA */
+#searchResults{
+    margin-top: 75px;
+    position: absolute;
+    z-index: 2;
+}
+#searchResults li {
+    width: 13em;
+    background-color: white;
+    padding: 7px 2px 7px 10px;
+    list-style-type: none;
+    border-radius: 3%;
+    border: 1px solid #888888;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+#searchResults li:hover {
+    background-color: #a13641;
+    transition: background-color 0.3s ease;
+}
+#searchResults a {
+    text-decoration: none;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+}
+
+
+table {
+    width: 100%; 
+    font-size: 100%;/*Antes estaba en 150%*/
+    table-layout: fixed; 
+}
+/*Cabecera info salón*/
+.cabecera_salon {
+    background-color: #68141C;
+    color: white;
+    text-align: left;
+    padding-left: 10%;
+    width: 100%;
+    height: 100%;
+    font-size: 30px; /* Tamaño de fuente más grande para la cabecera */
+}
+/* Estilo para la tabla de info de salón */
+.tabla_infosalon {
+    max-height: 200px; 
+    overflow-y: auto; 
+    border-collapse: collapse; 
+    width: 100%; 
+}
+/* Añade estilos adicionales a la tabla, si es necesario */
+.tabla-horarios table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.tabla-horarios th, .tabla-horarios td {
+    padding: 8px;
+    text-align: center;
+}
+.tabla-horarios th {
+    background-color: cadetblue;
+    color: white;
+}
+.tabla-horarios tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+.tabla-horarios tr:hover {
+    background-color: #ddd;
+}
+.tabla-horarios button {
+    height: 30px;
+    width: 80px;
+    margin-top: 10px;
+}
+
+#mostrarHorario {
+    z-index: 1; /* Un valor mayor que otros elementos si es necesario */
+}
+.oculto {
+    display: none;
+}
+
+
+/*Estilos para mostrar las rutas*/
+
+/* Establece un estilo para el contenedor principal */
+#ruta {
+    display: flex;
+    width: 100%;
+    height: 90%;
+    position: relative;
+    background-color: #FFF7E7;
+}
+
+#central{
+    display: flex;
+    height: 75%;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%,-50%);
+    background-color: #68141C;
+    width: 60%;
+}
+
+#central button{
+    height: 100%;
+    width: 3%;
+}
+#central img{
+    height: 100%;
+    width: 97%;
+}
+
+
+/**/
+#aceptar {
+    position: absolute;
+    bottom: 3%;
+    right: 50%;
+    transform: translate(50%,0);
+}
+
+#aceptar button{
+    position: relative;
+    font-size: 1.2em;
+    padding: 0.5rem 2rem;
+    border-radius: 1rem;
+    background-color: #68141C;
+    color: #fff;
+}
+
+#temporal{
+    position: absolute;
+    right: 2rem;
+    top: 2rem;
+    z-index: 1;
+    
+}
+#temporal button{
+    background-color: #68141C;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 0.5rem 2rem;
+    border-radius: 1rem;
+}
+
+/*Botones del cambio de pisos*/
+.toggle-button {
+    font-size: 1em;
+    cursor: pointer;
+    
+}
+.toggle-button.active {
+    background-color: #68141C; /* Cambia el color como desees */
+    color: #fff;
+}
+
+
+/*Estilos para la ventana de rutas EN WEEEEEEEEBBBBBBBBBBBBB*/
+
+/* Estilos específicos para #ventanaRuta 
+ El de web
+#ventanaRuta {
+    display: block;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: -55px 0 0 75%;
+    
+}
+
+#ventanaRuta {
+    display: block;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: -55px 0 0 75%;
+    
+}
+
+
+#ventanaRuta select {
+    width: 100%;
+    padding: 1px 1px 1px 40px; 
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 20px 20px;
+}
+
+#ventanaRuta #inicio {
+    background-image: url('../img/fin.png');
+}
+
+#ventanaRuta #fin {
+    background-image: url('../img/inicio.png');
+}
+
+#ventanaRuta select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+#ventanaRuta button.toggle-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #a13641;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#ventanaRuta button.toggle-button:hover {
+    background-color: #a13641;
+}
+
+ Ajustes para dispositivos móviles 
+@media (max-width: 600px) {
+    #ventanaRuta {
+        width: 90%;
+        padding: 15px;
+    }
+
+    #ventanaRuta select, 
+    #ventanaRuta button.toggle-button {
+        font-size: 14px;
+    }
+}
+
+*/
+
+#ventanaRuta {
+    display: flex; /* Cambiar block a flex para aprovechar flexbox */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin: 450px auto 0; /* Centrar el contenedor horizontalmente */
+    width: 80%; /* Ajustar el ancho a 80% por defecto */
+    max-width: 500px; /* Establecer un ancho máximo */
+}
+
+#ventanaRuta select {
+    width: 100%;
+    padding: 1px 1px 1px 40px; /* Añadir espacio para la imagen */
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    color: #333;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    background-size: 20px 20px;
+}
+
+#ventanaRuta #inicio {
+    background-image: url('../img/fin.png');
+}
+
+#ventanaRuta #fin {
+    background-image: url('../img/inicio.png');
+}
+
+#ventanaRuta select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+#ventanaRuta button.toggle-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #a13641;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#ventanaRuta button.toggle-button:hover {
+    background-color: #8b2e36;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 600px) {
+    #ventanaRuta {
+        width: 80%; /* Reducir el ancho en móviles */
+        padding: 15px;
+        margin: 450px auto 0; /* Reducir el margen superior en móviles */
+        
+    }
+
+    #ventanaRuta select, 
+    #ventanaRuta button.toggle-button {
+        font-size: 14px; /* Reducir el tamaño de fuente en móviles */
+    }
+
+    
+}
