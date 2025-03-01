@@ -1,0 +1,81 @@
+
+/*Estilos de la ventana de horarios*/
+#ventanaEmergenteHorario {
+    border-radius: 20px;
+    display: none;
+    width: 80%;
+    height: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.ventana_horarios {
+    background-color: #FFF7E7;
+    border: 1.8px solid black;
+    border-radius: 5px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 80%;
+    padding: 20px;
+    text-align: center;
+    overflow-y: scroll; /* Agrega una barra de desplazamiento vertical cuando sea necesario */
+}
+.tabla_horarios{
+    color: white;
+    background-color: #68141C;
+    width: 100%; 
+    height: 20%; 
+    border: 1.5px solid black;
+    word-wrap: break-word;
+    font-family: 'Inter', sans-serif;
+}
+#fila_horarios{
+    background-color: #FFF7E7;
+    color: black;
+    font-size: 90%;
+    padding-top: 10px;
+}
+.h2_horarios{
+    padding-left: 70px ;
+    padding-top: 10px;
+    color:#68141C;
+    font-family: 'Roboto', sans-serif;
+}
+/*Intenté que se vea el botón con la imagen pero por algú*/
+.cerrar_ventana {
+    position: absolute;
+    top: 5px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 40px; 
+}
+/*Estilo del boton Vista Horario*/
+#vista_horario{
+    background-color: #68141C;
+    color: white;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 50px;
+    cursor: pointer;
+    border-radius: 5px; /* Ajusta el valor para bordes menos redondeados */
+    border: 1px solid black;
+    position: relative;
+    bottom: 78px;
+    left: 10%;
+    font-size: 100%;
+    width: 9%;
+    height: 60%;
+    line-height: 3;
+}
+.titulo-horario {
+    font-family: 'Roboto', sans-serif;
+    /* Agrega otros estilos para el título si lo necesitas */
+}
+.contenido-horario {
+    font-family: 'Inter', sans-serif;
+    /* Agrega otros estilos para el contenido si lo necesitas */
+}
