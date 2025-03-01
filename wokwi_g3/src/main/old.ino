@@ -45,6 +45,8 @@ NTPClient timeClient(ntpUDP, "id.pool.ntp.org");
 void setup()
 {
   Serial.begin(115200);
+  connectWifi();
+  setupAWS();
   connectAWS();
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(GREEN_LED, OUTPUT);
@@ -88,15 +90,15 @@ void loop()
 int validateCard(String uuidStr)
 {
   HTTPClient http;
-  http.begin(API_URL);
+  http.begin(VALIDATION_API);
   http.addHeader("Content-Type", "application/json");
 
   
 
   // Prepare JSON payload
-  String payload = "{\"id\":\"" + cardNumber + "\"}";
+  String payload = "{\"id\":\"" + uuidStr + "\"}";
 
-  Serial.println("Validating card: " + cardNumber);
+  Serial.println("Validating card: " + uuidStr);
   int httpResponseCode = http.POST(payload);
 
   if (httpResponseCode > 0)
@@ -161,6 +163,7 @@ void connectWifi(){
 void setupAWS()
 {
   // Configure WiFiClientSecure to use the AWS IoT device credentials
+  
   net.setCACert(AWS_CERT_CA);
   net.setCertificate(AWS_CERT_CRT);
   net.setPrivateKey(AWS_CERT_PRIVATE);
@@ -251,8 +254,9 @@ void processRFID(MFRC522 &rfidModule, int door) {
   {
     return;
   }
+ Serial.println("Acerque la tarjeta al lector");
   String cardNumber = "";
-
+  //cardNumber = Serial.readStringUntil('\n');
   for (byte i = 0; i < rfidModule.uid.size; i++)
   {
 
