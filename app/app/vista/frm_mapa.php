@@ -31,6 +31,76 @@ foreach($info  as $reg  ){}
     <!--Agregar BootStrap al proyecto (CSS)-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+    <!-- AWS SDK para DynamoDB -->
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1057.0.min.js"></script>
+    <style>
+        /* Estilos para la ventana de ingresos */
+        .ingresos-container {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 350px;
+            z-index: 1000;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .ingresos-header {
+            background-color: #f3f3f3;
+            padding: 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .ingresos-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0;
+        }
+        
+        .ingresos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ingresos-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        
+        .ingresos-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        
+        .status-button {
+            background-color: red;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 120px;
+            font-size: 14px;
+        }
+        
+        /* Colores para estados */
+        .success-bg { background-color: #a3f7a3; }
+        .warning-bg { background-color: #ffdb58; }
+        .error-bg { background-color: #ff6961; }
+    </style>
     <script>
         function redirigir_login() {
         window.location.href = "../controlador/usu_controlador.php?accion=navegar_a_login";
@@ -282,6 +352,19 @@ foreach($info  as $reg  ){}
         
     </div>
 
+    <!-- Contenedor para la ventana de ingresos -->
+    <div class="ingresos-container">
+        <div class="ingresos-header">
+            Registro de Ingresos
+        </div>
+        <div class="ingresos-scroll" id="tabla">
+            <!-- Aquí se cargará dinámicamente la tabla de ingresos -->
+        </div>
+        <div class="ingresos-buttons">
+            <button id="statusButton1" class="status-button">Puerta 1</button>
+            <button id="statusButton2" class="status-button">Puerta 2</button>
+        </div>
+    </div>    
 
     <!--AGREGAR BOOTSTRAP (JSCRIPT)-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
@@ -335,6 +418,7 @@ cerrarVentanaHorarioBtn.addEventListener('click', function() {
 </script>
 </body>
 <script type="text/javascript" src="../../public/js/mapa_config.js"></script>
+<script type="text/javascript" src="../../public/js/dynamoDB.js"></script>
 <script>
     function fetchData(doorValue) {
         $.ajax({
