@@ -229,6 +229,43 @@ var borde ={
         { "type": "Feature", "properties": { "id": null }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -77.085376625485679, -12.052733189168217 ], [ -77.085401109567485, -12.052738340831473 ] ] ] } }
         ]
         }
+    var puerta1 = {
+        "type": "FeatureCollection",
+        "name": "puerta1",
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "id": "1", "name": "Linea Roja" },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                            [-77.085799692330085, -12.053527589277607], // Coordenada inicial
+                            [-77.085830899008329, -12.053531336498159]   // Coordenada final
+                    ]
+                }
+            }
+        ]
+    };
+
+    var puerta2 = {
+        "type": "FeatureCollection",
+        "name": "puerta2",
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+        "features": [
+            {
+                "type": "Feature",
+                "properties": { "id": "2", "name": "Linea Roja" },
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                            [-77.085179952146419, -12.053434700541395], // Coordenada inicial
+                            [-77.085224529731491, -12.053440081820879]   // Coordenada final
+                    ]
+                }
+            }
+        ]
+    };
     
 
 map.on('load', () => {
@@ -464,7 +501,40 @@ map.on('load', () => {
             map.setLayoutProperty('maine3', 'visibility', 'none');
             map.setLayoutProperty('outline3', 'visibility', 'none');
             map.setLayoutProperty('poi-labels3', 'visibility', 'none');
-            map.setLayoutProperty('bd3', 'visibility', 'none');        
+            map.setLayoutProperty('bd3', 'visibility', 'none');
+        
+        map.addSource('puerta1', {
+            'type': 'geojson',
+            'data': puerta1
+        });
+
+        map.addLayer({
+            'id': 'lineaRoja',
+            'type': 'line',
+            'source': 'puerta1',
+            'layout': {},
+            'paint': {
+                'line-color': '#FF0000', // Color rojo
+                'line-width': 4          // Grosor de la línea
+            }
+        });
+
+        map.addSource('puerta2', {
+            'type': 'geojson',
+            'data': puerta2
+        });
+
+        map.addLayer({
+            'id': 'lineaRoja2',
+            'type': 'line',
+            'source': 'puerta2',
+            'layout': {},
+            'paint': {
+                'line-color': '#FF0000', // Color rojo
+                'line-width': 4          // Grosor de la línea
+            }
+        });
+        
     });
 
     function mostrar(code)
