@@ -130,7 +130,7 @@ foreach($info  as $reg  ){}
             <!--Aqui se guardan los datos-->
 
 
-            <button onclick="redirigir_login()"><img src="../../public/img/usuario.png" alt="imagen" >Acceder</button>   
+            <!--<button onclick="redirigir_login()"><img src="../../public/img/usuario.png" alt="imagen" >Acceder</button>-->   
         </div>
     </header>
         <!-- BÚSQUEDA-->
