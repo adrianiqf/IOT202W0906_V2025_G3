@@ -335,6 +335,54 @@ cerrarVentanaHorarioBtn.addEventListener('click', function() {
 </script>
 </body>
 <script type="text/javascript" src="../../public/js/mapa_config.js"></script>
+<script>
+    function fetchData(doorValue) {
+        $.ajax({
+            url: "proxy.php",
+            type: "POST",
+            data: { door: doorValue },
+            dataType: "json",
+            success: function (data) {
+                if (data.statusCode === 200) {
+                    const records = JSON.parse(data.body);
+                    const tableBody = $("#data-table tbody");
+                    tableBody.empty(); // Limpiar tabla antes de agregar nuevos datos
+
+                    records.forEach(item => {
+                        const row = `
+                            <tr>
+                                <td>${item.usr}</td>
+                                <td>${item.codigo_alumno}</td>
+                                <td>${item.apellidos}</td>
+                                <td>${item.nombres}</td>
+                                <td>${item.carrera}</td>
+                                <td>${item.fecha_creacion}</td>
+                            </tr>
+                        `;
+                        tableBody.append(row);
+                    });
+                } else {
+                    console.error("Error en la respuesta del servidor");
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error en la solicitud:", error);
+            }
+        });
+    }
+
+    // Llamar a fetchData con un valor por defecto
+    $(document).ready(function () {
+        //fetchData(1); // Puedes cambiar el valor aquí
+
+        // Si tienes un formulario o botón para cambiar el "door", puedes hacer algo así:
+        $("#btnBuscar").click(function () {
+            const doorValue = $("#doorInput").val();
+            fetchData(doorValue);
+        });
+    });
+</script>
+
 
 </html>
 <!--Prueba!>
