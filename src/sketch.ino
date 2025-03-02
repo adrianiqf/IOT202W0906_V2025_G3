@@ -82,8 +82,7 @@ void loop()
   timeClient.update();
   processRFID(rfid1, 1);
   
-  processRFID(rfid2, 2);
-
+  //processRFID(rfid2, 2);
   
 }
 
@@ -250,14 +249,14 @@ void accessDenied()
 // Función que procesa la lectura de una tarjeta RFID en un lector específico
 void processRFID(MFRC522 &rfidModule, int door) {
   // Verifica si hay una tarjeta presente y la lee
-  if (!rfidModule.PICC_IsNewCardPresent() || !rfidModule.PICC_ReadCardSerial())
+  /*if (!rfidModule.PICC_IsNewCardPresent() || !rfidModule.PICC_ReadCardSerial())
   {
     return;
-  }
+  }*/
  Serial.println("Acerque la tarjeta al lector");
   String cardNumber = "";
-  //cardNumber = Serial.readStringUntil('\n');
-  for (byte i = 0; i < rfidModule.uid.size; i++)
+  cardNumber = Serial.readStringUntil('\n');
+  /*for (byte i = 0; i < rfidModule.uid.size; i++)
   {
 
     if (rfidModule.uid.uidByte[i] < 0x10)
@@ -267,7 +266,7 @@ void processRFID(MFRC522 &rfidModule, int door) {
       cardNumber += " ";
     }
     cardNumber += String(rfidModule.uid.uidByte[i] , HEX);
-  }
+  }*/
   cardNumber.trim();
   Serial.println("Card number: " + cardNumber);
  
