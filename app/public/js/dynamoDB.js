@@ -54,3 +54,125 @@ function obtenerUsuario(numeroTarjeta, callback) {
         }
     });
 }
+
+// Buscar datos del usuario en la tabla usuarios
+function obtenerDatosUsuario(usr, callback) {
+    var params = {
+        TableName: usuariosTable,
+        FilterExpression: "usr = :usr",
+        ExpressionAttributeValues: { ":usr": usr }
+    };
+
+    dynamoDB.scan(params, function(err, data) {
+        if (err) {
+            console.error("Error buscando en tabla usuarios:", err);
+            callback({ usr: usr }); // Devolvemos al menos el usr si hay error
+        } else {
+            if (data.Items.length > 0) {
+                // Extraemos todos los campos solicitados
+                let usuario = {
+                    usr: usr,
+                    nombres: data.Items[0].nombres || "No disponible",
+                    apellidos: data.Items[0].apellidos || "No disponible",
+                    carrera: data.Items[0].carrera || "No disponible",
+                    codigo_alumno: data.Items[0].codigo_alumno || "No disponible"
+                };
+                callback(usuario);
+            } else {
+                // Si no encontramos el usuario en la tabla usuarios, devolvemos solo el usr
+                callback({ usr: usr });
+            }
+        }
+    });
+}
+
+// Detectar nueva inserción y actualizar botones
+// Modificación en la función detectarInserciones para cambiar también el color de los polígonos
+function detectarInserciones() {
+    var params = { TableName: tableName };
+
+    dynamoDB.scan(params, function(err, data) {
+        if (err) {
+            console.error("Error obteniendo datos:", err);
+        } else {
+            if (data.Items.length === 0) return;
+
+            let registrosOrdenados = data.Items
+                .filter(item => item.payload && item.payload.fecha)
+                .sort((a, b) => b.payload.fecha - a.payload.fecha);
+
+            if (registrosOrdenados.length === 0) return;
+
+            let nuevaInsercion = registrosOrdenados[0]; // Última inserción
+            let nuevoTimestamp = nuevaInsercion.payload.fecha;
+
+            if (nuevoTimestamp > lastTimestamp) {
+                lastTimestamp = nuevoTimestamp;
+                console.log("Nueva inserción detectada:", nuevaInsercion);
+                
+                // Seleccionar el botón según el dispositivo
+                let dispositivo = nuevaInsercion.payload.dispositivo;
+                let boton = dispositivo === "rfid1"
+                    ? document.getElementById("statusButton1")
+                    : document.getElementById("statusButton2");
+                
+                // Identificar qué polígono modificar
+                let lineaId = dispositivo === "rfid1" ? "lineaRoja" : "lineaRoja2";
+
+                // Verificar condiciones y cambiar color del botón y polígono
+                if (!nuevaInsercion.payload.detectado && !nuevaInsercion.payload.acceso) {
+                    boton.style.backgroundColor = "red"; // Mantener rojo si no detectado y no acceso
+                    map.setPaintProperty(lineaId, 'line-color', '#FF0000'); // Rojo
+                } else if (nuevaInsercion.payload.detectado && !nuevaInsercion.payload.acceso) {
+                    boton.style.backgroundColor = "red"; // Mantener rojo si detectado y acceso denegado
+                    map.setPaintProperty(lineaId, 'line-color', '#FF0000'); // Rojo
+                } else {
+                    boton.style.backgroundColor = "green"; // Cambiar a verde si acceso es permitido
+                    map.setPaintProperty(lineaId, 'line-color', '#00FF00'); // Verde
+
+                    // Volver a rojo después de 3 segundos (tanto botón como línea)
+                    setTimeout(() => {
+                        boton.style.backgroundColor = "red";
+                        map.setPaintProperty(lineaId, 'line-color', '#FF0000'); // Rojo
+                    }, 3000);
+                }
+
+                // El resto del código permanece igual...
+                let payload = nuevaInsercion.payload;
+                let numeroTarjeta = payload.numero_tarjeta;
+
+                obtenerUsuario(numeroTarjeta, function(datosUsuario) {
+                    // Clonar el payload para no modificar el original
+                    let payloadConUsuario = {...payload};
+                    
+                    // Agregar los datos del usuario al payload
+                    if (datosUsuario) {
+                        payloadConUsuario.usr = datosUsuario.usr || "Desconocido";
+                        payloadConUsuario.nombres = datosUsuario.nombres || "No disponible";
+                        payloadConUsuario.apellidos = datosUsuario.apellidos || "No disponible";
+                        payloadConUsuario.carrera = datosUsuario.carrera || "No disponible";
+                        payloadConUsuario.codigo_alumno = datosUsuario.codigo_alumno || "No disponible";
+                    } else {
+                        payloadConUsuario.usr = "Desconocido";
+                        payloadConUsuario.nombres = "No disponible";
+                        payloadConUsuario.apellidos = "No disponible";
+                        payloadConUsuario.carrera = "No disponible";
+                        payloadConUsuario.codigo_alumno = "No disponible";
+                    }
+                    
+                    // Agregar al inicio de la cola
+                    colaInserciones.unshift(payloadConUsuario);
+                    
+                    // Actualizar la tabla
+                    actualizarTabla();
+                    
+                    // Eliminar la inserción después de 20 segundos
+                    setTimeout(() => {
+                        colaInserciones.pop();
+                        actualizarTabla();
+                    }, 60000);
+                });
+            }
+        }
+    });
+}
