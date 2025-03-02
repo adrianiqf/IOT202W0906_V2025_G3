@@ -34,3 +34,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 }
+
+function validarUsuario($cn, $usuario, $contrasena) {
+    // Utiliza la conexión a la base de datos para verificar las credenciales
+    $consulta = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
+    $stmt = mysqli_prepare($cn, $consulta);
+    mysqli_stmt_bind_param($stmt, "ss", $usuario, $contrasena);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+
+    if (mysqli_stmt_num_rows($stmt) == 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+?>
