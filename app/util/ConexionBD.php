@@ -3,8 +3,8 @@
 class ConexionBD
 {
   const servidor="localhost";
-  const usuario="root";
-  const password="";
+  const usuario="root";//usuario de su base de datos
+  const password="";//coloquen la contra de su base de datos Mysql
   const basedatos="mapafisi";
   public $cn=null;
 
