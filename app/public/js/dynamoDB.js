@@ -176,3 +176,49 @@ function detectarInserciones() {
         }
     });
 }
+// Actualizar la tabla con los elementos en la cola
+function actualizarTabla() {
+    let tablaHTML = "<table class='ingresos-table'>";
+
+    colaInserciones.forEach(payload => {
+        let colorFondo = "#ffffff"; // Blanco por defecto
+        let nombrePuerta = payload.dispositivo === "rfid1" ? "Puerta 1" : payload.dispositivo === "rfid2" ? "Puerta 2" : "Desconocido";
+
+        // Enmascarar el número de tarjeta, dejando visibles solo los últimos 3 dígitos
+        let numeroTarjeta = payload.numero_tarjeta;
+        let numeroTarjetaOculto = numeroTarjeta.length > 3 
+            ? "*".repeat(numeroTarjeta.length - 3) + numeroTarjeta.slice(-3) 
+            : numeroTarjeta; 
+
+        let contenido = `  
+            <strong>Fecha:</strong> ${convertirFecha(payload.fecha)}<br>
+            <strong>${nombrePuerta}</strong><br>
+            <strong>Número de tarjeta:</strong> ${numeroTarjetaOculto}<br>
+            <strong>Nombres:</strong> ${payload.nombres || "N/A"}<br>
+            <strong>Apellidos:</strong> ${payload.apellidos || "N/A"}<br>
+            <strong>Carrera:</strong> ${payload.carrera || "N/A"}<br>
+            <strong>Código de alumno:</strong> ${payload.codigo_alumno || "N/A"}
+        `;
+
+        if (payload.detectado && payload.acceso) {
+            colorFondo = "#a3f7a3"; // Verde fuerte
+        } else if (!payload.detectado && payload.acceso) {
+            colorFondo = "#ffdb58"; // Amarillo fuerte
+            contenido = "<strong>ERROR: La persona no ingresó</strong>";
+        } else if (payload.detectado && !payload.acceso) {
+            colorFondo = "#ff6961"; // Rojo fuerte
+            contenido = "<strong>ALERTA: Se ha detectado un acceso no autorizado</strong>";
+        } else if (!payload.detectado && !payload.acceso) {
+            colorFondo = "#ff6961"; // Rojo fuerte
+            contenido = "<strong>ERROR: La tarjeta no está registrada en el sistema.</strong>";
+        }
+
+        tablaHTML += `<tr style="background-color: ${colorFondo};"><td>${contenido}</td></tr>`;
+    });
+
+    tablaHTML += "</table>";
+    document.getElementById("tabla").innerHTML = tablaHTML;
+}
+
+// Llamar la detección de inserciones en intervalos regulares
+setInterval(detectarInserciones, 2000);
