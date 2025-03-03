@@ -6,3 +6,5 @@ Intregantes:
 - Ortiz Urbai, Sebastian
 - Quispe Fajardo, Adrian Ismael
 - Ramírez García, Jorge Armando
+## Link de los documentos:
+ ( [https://drive.google.com/drive/folders/1mqAS1kZ4JjuMbic8bCHc9h6mNTzZkcKb?usp=sharing] )
