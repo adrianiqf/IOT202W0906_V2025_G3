@@ -1,4 +1,4 @@
-# ProyectoFinal_Automatizacion_G5
+# ProyectoFinal_IOT_G3
 Intregantes:
 - Cruces Salhuana, Diego Axel
 - Moore Salazar, Jhon Antony
