@@ -737,7 +737,7 @@ function toggleLayer(layerId) {
     // Centra el mapa en las coordenadas del centro del polígono
     map.flyTo({
         center: center.geometry.coordinates,
-        zoom: 25 // Puedes ajustar el nivel de zoom deseado
+        zoom: 22 // Puedes ajustar el nivel de zoom deseado
     });
 
     //para hacer que se muestre la info del mapa
