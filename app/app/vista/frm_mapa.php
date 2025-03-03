@@ -100,6 +100,44 @@ foreach($info  as $reg  ){}
         .success-bg { background-color: #a3f7a3; }
         .warning-bg { background-color: #ffdb58; }
         .error-bg { background-color: #ff6961; }
+        #data-table th, 
+#data-table td {
+    padding-left: 15px; /* Agrega espacio en toda la tabla */
+}
+
+        #data-table {
+            display: none;
+        position: fixed;
+        top: 18%;
+        right: 3em;
+        width: 30%; /* Ligero ajuste para mejor proporción */
+        max-height: 50%;
+        overflow-y: auto; /* Solo desplazamiento vertical */
+        z-index: 1000; /* Mayor prioridad sobre otros elementos */
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 10px 2px 10px rgba(0,0,0,0.2);
+            font-family: 'Roboto', sans-serif;
+
+            
+}
+
+#data-table th:nth-child(1) { width: 10%; }  /* ID */
+#data-table th:nth-child(2) { width: 15%; } /* Código Alumno */
+#data-table th:nth-child(3) { width: 30%; } /* Apellidos */
+#data-table th:nth-child(4) { width: 25%; } /* Nombres */
+/*#data-table th:nth-child(5) { width: 25%; } /* Carrera */
+#data-table th:nth-child(6) { width: 35%; } /* Fecha Creación */
+
+caption {
+    caption-side: top; /* Asegura que el caption esté arriba */
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px;
+    background-color: #f3f3f3;
+    border-top: 2px solid #ddd;
+    text-align: center;
+}
     </style>
     <script>
         function redirigir_login() {
@@ -232,6 +270,24 @@ foreach($info  as $reg  ){}
 <!-- Zonas flotantes
 <button class="toggle-button" id="button1" onclick="toggleLayer(1)">1</button>
 -->    
+
+<table id="data-table" style >
+<caption style="font-size: 1.2em; font-weight: bold; padding: 10px; background-color: #f3f3f3; border-top: 2px solid #ddd;">
+       
+    </caption>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Código</th>
+                <th>Apellidos</th>
+                <th>Nombres</th>
+                <!--<th>Carrera</th>-->
+                <th>Fecha Ingreso</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
   <div class="navegador">
   <button class="toggle-button active" id="button1" onclick="toggleButton('button1'), toggleLayer(1)">1</button>
     <button class="toggle-button" id="button2" onclick="toggleButton('button2'), toggleLayer(2)">2</button>
@@ -421,16 +477,21 @@ cerrarVentanaHorarioBtn.addEventListener('click', function() {
 <script type="text/javascript" src="../../public/js/dynamoDB.js"></script>
 <script>
     function fetchData(doorValue) {
-        $.ajax({
+        document.getElementById("data-table").style.display = "none";
+        if (doorValue == 1 ||doorValue == 2 ){
+            
+            $.ajax({
             url: "proxy.php",
             type: "POST",
             data: { door: doorValue },
             dataType: "json",
             success: function (data) {
                 if (data.statusCode === 200) {
+                    document.getElementById("data-table").style.display = "table";
                     const records = JSON.parse(data.body);
                     const tableBody = $("#data-table tbody");
                     tableBody.empty(); // Limpiar tabla antes de agregar nuevos datos
+                    $("#data-table caption").text(`Ingresos Detectados - Puerta ${doorValue}`);
 
                     records.forEach(item => {
                         const row = `
@@ -439,7 +500,6 @@ cerrarVentanaHorarioBtn.addEventListener('click', function() {
                                 <td>${item.codigo_alumno}</td>
                                 <td>${item.apellidos}</td>
                                 <td>${item.nombres}</td>
-                                <td>${item.carrera}</td>
                                 <td>${item.fecha_creacion}</td>
                             </tr>
                         `;
@@ -453,6 +513,11 @@ cerrarVentanaHorarioBtn.addEventListener('click', function() {
                 console.error("Error en la solicitud:", error);
             }
         });
+        }else{
+            document.getElementById("data-table").style.display = "none";
+
+        }
+        
     }
 
     // Llamar a fetchData con un valor por defecto

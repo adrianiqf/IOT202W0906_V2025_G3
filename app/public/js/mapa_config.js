@@ -5,10 +5,10 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/streets-v12',
     center: [-77.08555632370167, -12.053057801094083],
     zoom: 18.5,
-    //maxBounds: [
-      //  [-77.0888854,-12.0627008], // Esquina suroeste de la zona permitida
-       // [-77.0832369,-12.0490944]  // Esquina noreste de la zona permitida
-      //]
+    maxBounds: [
+        [-77.0888854,-12.0627008], // Esquina suroeste de la zona permitida
+        [-77.0832369,-12.0490944]  // Esquina noreste de la zona permitida
+      ]
 });
 map.addControl(new mapboxgl.NavigationControl());
 
@@ -17,7 +17,50 @@ var piso1 = {
     "name": "piso1GJ",
     "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
     "features": [
-    { "type": "Feature", "properties": { "id": null, "nombre_area": "Capilla", "codigo": "2" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085313811084802, -12.053230704495387 ], [ -77.085363417261263, -12.053236661087235 ], [ -77.085368783668855, -12.053193918749828 ], [ -77.08531917749238, -12.053187962156436 ], [ -77.085313811084802, -12.053230704495387 ] ] ] ] } },
+        //puertas
+        { "type": "Feature", "properties": { "id": null, "nombre_area": "Puerta 1", "codigo": "1" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [
+            -77.08578050794216,
+            -12.053517834269897
+          ],
+          [
+            -77.08577883091122,
+            -12.053532430776244
+          ],
+          [
+            -77.08573237716584,
+            -12.053528166628595
+          ],
+          [
+            -77.08573388649368,
+            -12.05351357012195
+          ],
+          [
+            -77.08578050794216,
+            -12.053517834269897
+          ] ] ] ] } },
+        { "type": "Feature", "properties": { "id": null, "nombre_area": "Puerta 2", "codigo": "2" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [
+            -77.0852441409979,
+            -12.053422862399643
+          ],
+          [
+            -77.08523386071748,
+            -12.053435769570328
+          ],
+          [
+            -77.08522648178341,
+            -12.053430685392144
+          ],
+          [
+            -77.0852367116694,
+            -12.053416908909284
+          ],
+          [
+            -77.0852441409979,
+            -12.053422862399643
+          ] ] ] ] } },
+    
+    //salones
+        { "type": "Feature", "properties": { "id": null, "nombre_area": "Capilla", "codigo": "A2" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085313811084802, -12.053230704495387 ], [ -77.085363417261263, -12.053236661087235 ], [ -77.085368783668855, -12.053193918749828 ], [ -77.08531917749238, -12.053187962156436 ], [ -77.085313811084802, -12.053230704495387 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "109", "codigo": "SA109-AP" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085608608277894, -12.053337205901105 ], [ -77.085689567317431, -12.053346927270281 ], [ -77.085698325484941, -12.053277170259536 ], [ -77.085617366445405, -12.053267448887837 ], [ -77.085608608277894, -12.053337205901105 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "108", "codigo": "SA108-AP" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085527227460133, -12.053327433886302 ], [ -77.08560818649967, -12.053337155255479 ], [ -77.08561694466718, -12.053267398244733 ], [ -77.085535985627644, -12.053257676873034 ], [ -77.085527227460133, -12.053327433886302 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "106", "codigo": "SA106-AP" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085365286697964, -12.053307988423098 ], [ -77.085446245737501, -12.053317709792275 ], [ -77.085455003905011, -12.053247952781529 ], [ -77.085374044865475, -12.05323823140983 ], [ -77.085365286697964, -12.053307988423098 ] ] ] ] } },
@@ -48,7 +91,7 @@ var piso1 = {
     { "type": "Feature", "properties": { "id": null, "nombre_area": "Escaleras" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085781040084584, -12.052690837798009 ], [ -77.085736681619863, -12.052683877491685 ], [ -77.08574090885935, -12.052657854365158 ], [ -77.085785267324127, -12.052664814670965 ], [ -77.085781040084584, -12.052690837798009 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "Escaleras" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085442029575105, -12.052638778009303 ], [ -77.085397671110385, -12.052631817702979 ], [ -77.085401898349872, -12.052605794576452 ], [ -77.085446256814649, -12.05261275488226 ], [ -77.085442029575105, -12.052638778009303 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "Auditorio", "codigo": "AUD" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085889183970153, -12.053127431367926 ], [ -77.085728692482078, -12.053108159916611 ], [ -77.085750587900876, -12.05293376721405 ], [ -77.08591107938895, -12.05295303867789 ], [ -77.085889183970153, -12.053127431367926 ] ] ] ] } },
-    { "type": "Feature", "properties": { "id": null, "nombre_area": "Cancha", "codigo": "1" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085226988978675, -12.052972638785345 ], [ -77.085358948646657, -12.052988484181462 ], [ -77.085389273801653, -12.052746950569855 ], [ -77.085257314133656, -12.052731105159474 ], [ -77.085226988978675, -12.052972638785345 ] ] ] ] } },
+    { "type": "Feature", "properties": { "id": null, "nombre_area": "Cancha", "codigo": "A1" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085226988978675, -12.052972638785345 ], [ -77.085358948646657, -12.052988484181462 ], [ -77.085389273801653, -12.052746950569855 ], [ -77.085257314133656, -12.052731105159474 ], [ -77.085226988978675, -12.052972638785345 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "GYM", "codigo": "GYM" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085115353512307, -12.053176823080392 ], [ -77.085184168064714, -12.0531850861684 ], [ -77.085191612438834, -12.053125793253132 ], [ -77.085122797886399, -12.05311753016298 ], [ -77.085115353512307, -12.053176823080392 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "Escaleras", "codigo": null }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085179952146419, -12.053434700541395 ], [ -77.085224529731491, -12.053440081820879 ], [ -77.085223997980577, -12.053443913901859 ], [ -77.085206169902136, -12.05344177440444 ], [ -77.085203982172388, -12.053459162512322 ], [ -77.08522179585789, -12.053461339544635 ], [ -77.085221228927111, -12.053466238605049 ], [ -77.085176651342039, -12.053460857326074 ], [ -77.085179952146419, -12.053434700541395 ] ] ] ] } },
     { "type": "Feature", "properties": { "id": null, "nombre_area": "Kiosco", "codigo": null }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ -77.085206163064001, -12.053441767172679 ], [ -77.085223994098044, -12.053443919684144 ], [ -77.085221793561786, -12.053461357537953 ], [ -77.085203962527729, -12.053459205026634 ], [ -77.085206163064001, -12.053441767172679 ] ] ] ] } },
@@ -649,7 +692,7 @@ function toggleLayer(layerId) {
 }
     
     function colorear_mostrar(codigo){
-        if (codigo != null) {
+        if (codigo == 1||codigo==2) {
             mostrar(codigo);
             //mostrar_info();
             mostrarIngresos(codigo);
@@ -687,19 +730,24 @@ function toggleLayer(layerId) {
     //Eventos
 
     function handleLayerClick(e) {
+        
     //para centrarlo en el mapa
      var center = turf.center(e.features[0].geometry);
 
     // Centra el mapa en las coordenadas del centro del polígono
     map.flyTo({
         center: center.geometry.coordinates,
-        zoom: 19 // Puedes ajustar el nivel de zoom deseado
+        zoom: 25 // Puedes ajustar el nivel de zoom deseado
     });
 
     //para hacer que se muestre la info del mapa
         var codigo = e.features[0].properties.codigo;
-        colorear_mostrar(codigo);
+        
         fetchData(codigo);
+        colorear_mostrar(codigo);
+        
+        
+
     }
     
     
