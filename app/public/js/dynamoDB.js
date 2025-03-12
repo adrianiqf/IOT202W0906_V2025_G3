@@ -130,11 +130,11 @@ function detectarInserciones() {
                     boton.style.backgroundColor = "green"; // Cambiar a verde si acceso es permitido
                     map.setPaintProperty(lineaId, 'line-color', '#00FF00'); // Verde
 
-                    // Volver a rojo después de 3 segundos (tanto botón como línea)
+                    // Volver a rojo después de 4 segundos (tanto botón como línea)
                     setTimeout(() => {
                         boton.style.backgroundColor = "red";
                         map.setPaintProperty(lineaId, 'line-color', '#FF0000'); // Rojo
-                    }, 3000);
+                    }, 4000);
                 }
 
                 // El resto del código permanece igual...
@@ -207,10 +207,11 @@ function actualizarTabla() {
             contenido = "<strong>ERROR: La persona no ingresó</strong>";
         } else if (payload.detectado && !payload.acceso) {
             colorFondo = "#ff6961"; // Rojo fuerte
-            contenido = "<strong>ALERTA: Se ha detectado un acceso no autorizado</strong>";
+            contenido = "<strong>ERROR: La tarjeta no está registrada en el sistema (" + nombrePuerta + ")</strong>";
+            //contenido = "<strong>ALERTA: Se ha detectado un acceso no autorizado</strong>";
         } else if (!payload.detectado && !payload.acceso) {
             colorFondo = "#ff6961"; // Rojo fuerte
-            contenido = "<strong>ERROR: La tarjeta no está registrada en el sistema.</strong>";
+            contenido = "<strong>ERROR: La tarjeta no está registrada en el sistema (" + nombrePuerta + ")</strong>";
         }
 
         tablaHTML += `<tr style="background-color: ${colorFondo};"><td>${contenido}</td></tr>`;

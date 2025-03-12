@@ -2,6 +2,7 @@
 *.log
 *.tmp
 *.bak
+*.env
 
 # Archivos generados durante la compilación
 /build/
